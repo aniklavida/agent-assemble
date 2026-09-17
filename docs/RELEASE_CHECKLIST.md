@@ -13,7 +13,9 @@ been run.
 
 ## Structure
 
-- [ ] A composed multi-level role stays within the word budget, measured rather than estimated.
+- [ ] A word ceiling has been chosen and a command enforces it. Until then this
+      item cannot be met, and the release it gates cannot be made.
+- [ ] A composed multi-level role is measured against that ceiling rather than estimated.
 - [ ] No sentence appears at two levels — checked mechanically, not by reading.
 - [ ] **Removing a parent level provably changes the child's behaviour.** If it does not, the inheritance is decorative and this line fails.
 

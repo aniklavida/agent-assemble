@@ -7,7 +7,9 @@
 ## If this adds or changes a node
 
 - [ ] It states something a good model would **not** already know
-- [ ] The always-loaded core is within the word budget; the rest is in references
+- [ ] The always-loaded core is small and the rest is in references. There is no
+      enforced ceiling yet, so state the `wc -w` count of any core you changed
+      rather than ticking this on judgement alone.
 - [ ] It does not restate its parent level
 - [ ] No instruction in it appears in another file
 
