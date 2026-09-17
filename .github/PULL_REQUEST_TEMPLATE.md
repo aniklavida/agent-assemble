@@ -1,19 +1,28 @@
 ## What changed
 
-
 ## Why
 
+## Which of the seven parts
 
-## Verification evidence
+## If this adds or changes a node
 
-- [ ] Tests/fixtures added or updated
-- [ ] Relevant checks passed
-- [ ] Documentation updated where behavior changed
+- [ ] It states something a good model would **not** already know
+- [ ] The always-loaded core is within the word budget; the rest is in references
+- [ ] It does not restate its parent level
+- [ ] No instruction in it appears in another file
 
-## Risk and limitations
+## If this adds an instruction an agent will act on
 
+An agent reads these files and acts on them with a filesystem and a shell, so an
+instruction is reviewed as code rather than as prose.
 
-## Upstream/provenance
+- [ ] It never tells an agent to fetch and execute a remote document
+- [ ] It never asks an agent to handle a credential, token or password
+- [ ] It does not assume a capability the agent may not have without saying so
 
-- [ ] No copied/adapted code
-- [ ] Copied/adapted code is declared with source, commit and licence
+## Claims
+
+Every statement about what this project does is one of: **implemented and
+tested**, **experimental**, **planned**, **unsupported**.
+
+- [ ] Nothing here is described as working that has not been run
