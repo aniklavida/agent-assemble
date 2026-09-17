@@ -1,6 +1,6 @@
 # Existing Project Confirmation Flow
 
-When a project manifest, meaningful file structure, or board directory is found, use this flow instead of the full new-project interview. The goal is: ten questions become four.
+When a project manifest, meaningful file structure, or board directory is found, use this flow instead of the full new-project interview. The goal is: ten questions become four — five when the repository has no board, since that one question has no default and cannot be inferred.
 
 ## What the agent reads first
 
@@ -35,7 +35,7 @@ If any of this is wrong, tell me now and I will correct it before continuing.
 
 ## What to ask — only what cannot be read
 
-After presenting the detection summary, ask only the questions that genuinely could not be determined. This is typically four or fewer.
+After presenting the detection summary, ask only the questions that genuinely could not be determined. This is four, or five when no board was found.
 
 Mandatory questions if not determinable from files:
 
@@ -43,6 +43,9 @@ Mandatory questions if not determinable from files:
 - **What does "done" mean here?** (local convention, not detectable)
 - **Which principles apply, and at what severity?** (project choice, not detectable)
 - **How much of the relay should run by default?** (agent chain depth — not detectable)
+- **Where do cards live?** — **only when detection found no board.** Ask it exactly as Group C question 10 in `setup/SKILL.md` words it; do not offer a default here or anywhere.
+
+  Detection can legitimately find nothing. Without this line an existing project with no board answers four questions and is never asked the one question that has no default, which is the failure this flow is most likely to produce. When a board *was* detected, connect to it and do not ask.
 
 Optional — ask only if genuinely ambiguous:
 

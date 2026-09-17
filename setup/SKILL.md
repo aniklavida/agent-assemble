@@ -25,7 +25,7 @@ Summarise what you found in a short paragraph before asking anything. The summar
 
 **What detection replaces:**
 - Stack questions are replaced by manifest findings.
-- Board location question is replaced if a board directory already exists.
+- Board location question is replaced **only if a board directory already exists.** If none is found, it is still asked, on either path — it is the one question with no default.
 - Branch conventions may be inferable from git log.
 
 Detection is always shown to the user. A silently wrong detection is worse than asking.
