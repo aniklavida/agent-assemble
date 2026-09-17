@@ -8,7 +8,8 @@ id: "TASK-001"
 title: "Imperative short summary"
 size: "direct | short | full"
 status: "todo"
-assigned_role: "BA"
+assigned_role: "BA"        # who acts NEXT, not who acted last
+# blocked_on: "..."      # set with assigned_role: "user" when waiting on an answer
 created_at: "YYYY-MM-DDTHH:MM:SSZ"
 updated_at: "YYYY-MM-DDTHH:MM:SSZ"
 ---
