@@ -49,6 +49,16 @@ Researcher
 knowledge, the inheritance is decorative. It must compose both and add only the
 seam between them.
 
+**Generic default, project override.** The model is hybrid. A role node ships with a
+small generic default so it functions on day one when downloaded into an unfamiliar
+repository. Once a project's own documentation exists, that documentation
+**overrides** the generic default rather than merely supplementing it.
+
+A purely generic role never reflects a team's actual practice. A purely
+project-specific role assumes documentation that may not exist on a fresh install.
+The generic default serves everyone immediately; the project override keeps the
+fit honest once real project documentation exists.
+
 ## 2 · Principles
 
 Written once, referenced by many roles, never restated under a role.
