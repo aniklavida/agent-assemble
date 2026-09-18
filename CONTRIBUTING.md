@@ -28,25 +28,26 @@ well written.
 Every node has a small always-loaded core and unlimited references loaded on
 demand.
 
-**The ceiling is planned, not yet enforced.** No number has been chosen and no
-command checks one. Until both exist, keep the core small by judgement, and
-treat the counts below as the evidence the number will be chosen from rather
-than as a limit you are under.
+**The ceiling is 200 words** for the always-loaded core of a node — its `SKILL.md`
+file only, not its `references/` files, which remain unlimited.
 
-This will be enforced rather than encouraged, for a reason: without enforcement
-every contributor adds a little more, and within a year the composed context
-exceeds what any agent can hold. If your addition does not fit the core, it is
-a reference.
+This is enforced rather than encouraged, for a reason: without enforcement every
+contributor adds a little more, and within a year the composed context exceeds
+what any agent can hold. If your addition does not fit the core, it is a
+reference.
+
+The limit is enforced by `scripts/check-word-budget.sh`, which runs in CI on every
+push and pull request.
 
 Current always-loaded cores, measured with `wc -w`:
 
 | Node | Words |
 | --- | --- |
-| `setup/SKILL.md` | 851 |
-| `board/SKILL.md` | 654 |
-| `workflow/SKILL.md` | 414 |
-| `log/SKILL.md` | 398 |
-| `documentation/SKILL.md` | 253 |
+| `setup/SKILL.md` | 178 |
+| `board/SKILL.md` | 166 |
+| `workflow/SKILL.md` | 187 |
+| `log/SKILL.md` | 187 |
+| `documentation/SKILL.md` | 161 |
 
 A reference file has no ceiling and is not counted here, because it is loaded
 only when the node needs it.

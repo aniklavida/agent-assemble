@@ -43,7 +43,7 @@ Mandatory questions if not determinable from files:
 - **What does "done" mean here?** (local convention, not detectable)
 - **Which principles apply, and at what severity?** (project choice, not detectable)
 - **How much of the relay should run by default?** (agent chain depth — not detectable)
-- **Where do cards live?** — **only when detection found no board.** Ask it exactly as Group C question 10 in `setup/SKILL.md` words it; do not offer a default here or anywhere.
+- **Where do cards live?** — **only when detection found no board.** Ask it exactly as Group C question 10 in [new-project.md](new-project.md) words it; do not offer a default here or anywhere.
 
   Detection can legitimately find nothing. Without this line an existing project with no board answers four questions and is never asked the one question that has no default, which is the failure this flow is most likely to produce. When a board *was* detected, connect to it and do not ask.
 

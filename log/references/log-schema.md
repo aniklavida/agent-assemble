@@ -14,15 +14,15 @@ This reference provides the schema specification and end-to-end examples for `lo
 1. **Timestamp:** ISO 8601 UTC formatted string (`YYYY-MM-DDTHH:MM:SSZ`).
 2. **Card ID:** Alphanumeric identifier matching the frontmatter `id:` in the corresponding task card (or direct task tag).
 3. **Event:** Exactly one of the permitted lifecycle events:
-   - `REQUEST_SIZED`
-   - `CARD_CREATED`
-   - `WORK_STARTED`
-   - `WORK_COMPLETED`
-   - `VERIFICATION_STARTED`
-   - `VERIFICATION_PASSED`
-   - `VERIFICATION_FAILED`
-   - `CARD_CLOSED`
-   - `DIRECT_CLOSED`
+   - `REQUEST_SIZED`: PM evaluates sizing (Direct, Short, or Full).
+   - `CARD_CREATED`: BA creates task card with acceptance criteria in `board/todo/`.
+   - `WORK_STARTED`: Employee moves task card to `board/in-progress/` and begins work.
+   - `WORK_COMPLETED`: Employee records diff and self-verification, handing off to SQA.
+   - `VERIFICATION_STARTED`: SQA acquires task card in `board/testing/`.
+   - `VERIFICATION_PASSED`: SQA verifies acceptance criteria and sabotage test, approving item.
+   - `VERIFICATION_FAILED`: SQA records failure evidence and returns item to Employee.
+   - `CARD_CLOSED`: PM confirms log completeness and moves task card to `board/done/`.
+   - `DIRECT_CLOSED`: PM completes direct path verification and closes work item.
 4. **Role:** Placeholder role executing the event (`PM`, `BA`, `Employee`, `SQA`).
 5. **Summary / Evidence:** Concrete factual record of actions taken, files edited, test outcomes, or rationale.
 6. **Result / Next State:** Resulting column and recipient role (e.g., `testing (SQA)`, `done`).
