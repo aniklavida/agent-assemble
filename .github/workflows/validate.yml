@@ -81,3 +81,12 @@ jobs:
             echo "Remove this check only when something is genuinely implemented."
             exit 1
           }
+
+      - name: Enforce per-node word budget on always-loaded core files
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A node's always-loaded core (SKILL.md) has a hard ceiling of 200 words
+          # to prevent exhausting an agent's context budget. References loaded on
+          # demand remain unlimited.
+          bash scripts/check-word-budget.sh

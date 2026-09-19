@@ -49,3 +49,24 @@ Originating user request or problem description.
 - Log audit: `confirmed unbroken transitions in log/LOG.md`
 - Sign-off note: `accepted and closed`
 ```
+
+## Field Semantics and Assignment Rules
+
+### `assigned_role` means who acts next, not who acted last
+
+A card in `todo/` created by the BA does not say `assigned_role: "BA"` — the BA has finished with it. It says who is expected to pick it up.
+
+This matters because the headline test for this project is that **a session with no memory can read the board and say what is done and what remains.** A column says where a card is; `assigned_role` says who it is waiting on. Without the second, "what remains" is answerable but "waiting on whom" is not, and those are different questions.
+
+When a role finishes its part, it sets `assigned_role` to the next role before moving the task item.
+
+### Waiting on someone outside the relay
+
+A card blocked on an answer from the user is not in progress and is not ready to pick up. It stays in its current column with:
+
+```yaml
+assigned_role: "user"
+blocked_on: "one sentence naming exactly what is needed"
+```
+
+Without this, a card waiting on a question sits in `todo/` or `in-progress/` looking like available work, and the next session picks it up and asks the same question again. That is the drift this project exists to prevent, reproduced inside the board itself.
