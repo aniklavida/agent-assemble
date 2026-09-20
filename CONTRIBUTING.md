@@ -47,7 +47,7 @@ Current always-loaded cores, measured with `wc -w`:
 | `board/SKILL.md` | 166 |
 | `workflow/SKILL.md` | 187 |
 | `log/SKILL.md` | 187 |
-| `documentation/SKILL.md` | 161 |
+| `documentation/SKILL.md` | 191 |
 
 A reference file has no ceiling and is not counted here, because it is loaded
 only when the node needs it.

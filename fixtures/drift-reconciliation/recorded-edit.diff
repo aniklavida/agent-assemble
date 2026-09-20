@@ -1,0 +1,6 @@
+--- a/documentation/decisions/decided-deferred.md
++++ b/documentation/decisions/decided-deferred.md
+@@ -16,3 +16,3 @@
+ | DEC-003 | Database Storage | SQLite | Embedded relational database without external service dependency |
+-| DEC-004 | Event Queue Transport | Memory channel | In-process asynchronous queue channel |
++| DEC-004 | Event Queue Transport | File spool directory | Durable file-based message spool surviving process restarts |

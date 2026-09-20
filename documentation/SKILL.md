@@ -18,13 +18,13 @@ Separates settled choices from deliberately postponed questions in `documentatio
 
 For the schema and examples, see [references/decided-deferred-template.md](references/decided-deferred-template.md).
 
-## Documentation Drift Rule
+## Documentation Drift Protocol
 
 When plans or decisions change, active task cards risk going stale.
 
 Whenever updating files in `documentation/`:
-1. **Audit active cards:** Review all cards in `board/todo/`, `board/in-progress/`, and `board/testing/`.
-2. **Evaluate impact:** Identify cards altered or invalidated by the documentation change.
-3. **Reconcile:** Update acceptance criteria immediately, or return invalidated cards to `board/todo/` with a documented reason.
+1. **Identify dependencies:** Audit open items in `board/todo/`, `board/in-progress/`, and `board/testing/`. Unaffected items remain untouched.
+2. **Confirm, never rewrite silently:** Present candidate adjustments for user confirmation. A board that edits itself is a second source of truth in disguise.
+3. **Reconcile or flag:** On confirmation, update criteria and append `CARD_RECONCILED` to `log/LOG.md`. If unreconciled, flag with what changed beneath it and append `DRIFT_DETECTED` to `log/LOG.md`. Never delete an invalidated item.
 
-For drift management protocols, see [references/documentation-guide.md](references/documentation-guide.md).
+For protocols and limits, see [references/documentation-guide.md](references/documentation-guide.md).

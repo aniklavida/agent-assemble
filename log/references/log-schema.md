@@ -23,6 +23,8 @@ This reference provides the schema specification and end-to-end examples for `lo
    - `VERIFICATION_FAILED`: SQA records failure evidence and returns item to Employee.
    - `CARD_CLOSED`: PM confirms log completeness and moves task card to `board/done/`.
    - `DIRECT_CLOSED`: PM completes direct path verification and closes work item.
+   - `DRIFT_DETECTED`: Documentation changed beneath active task item; item flagged with changes and blocked on user resolution.
+   - `CARD_RECONCILED`: Task item criteria updated to match revised documentation following user confirmation.
 4. **Role:** Placeholder role executing the event (`PM`, `BA`, `Employee`, `SQA`).
 5. **Summary / Evidence:** Concrete factual record of actions taken, files edited, test outcomes, or rationale.
 6. **Result / Next State:** Resulting column and recipient role (e.g., `testing (SQA)`, `done`).
@@ -63,4 +65,14 @@ This reference provides the schema specification and end-to-end examples for `lo
 | 2026-09-18T14:30:00Z | TASK-102 | WORK_COMPLETED | Employee | Added guard for empty payload; regression test added and passing | testing (SQA) |
 | 2026-09-18T14:45:00Z | TASK-102 | VERIFICATION_PASSED | SQA | Empty payload handled gracefully; sabotage check verified; approved | review (PM) |
 | 2026-09-18T15:00:00Z | TASK-102 | CARD_CLOSED | PM | Final review verified; closed | done |
+```
+
+### 4. Documentation Drift Reconciliation Lifecycle
+
+```markdown
+| Timestamp | Card ID | Event | Role | Summary / Evidence | Result / Next State |
+|---|---|---|---|---|---|
+| 2026-09-21T10:00:00Z | TASK-101 | CARD_CREATED | BA | Created queue consumer item assuming in-memory channel (DEC-004) | todo (Employee) |
+| 2026-09-21T10:30:00Z | TASK-101 | CARD_RECONCILED | BA | Reconciled criteria to file spool transport following user confirmation on DEC-004 | todo (Employee) |
+| 2026-09-21T10:30:00Z | TASK-102 | DRIFT_DETECTED | BA | Flagged: DEC-004 transport changed to file spool beneath in-progress retry logic | in-progress (user) |
 ```
