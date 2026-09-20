@@ -90,3 +90,11 @@ jobs:
           # to prevent exhausting an agent's context budget. References loaded on
           # demand remain unlimited.
           bash scripts/check-word-budget.sh
+
+      - name: Verify the documentation-drift reconciliation fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The fixture is the only evidence this procedure produces the outcome it
+          # describes. A check nothing runs is a check that does not exist.
+          bash scripts/verify-drift-reconciliation.sh

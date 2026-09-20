@@ -70,3 +70,10 @@ blocked_on: "one sentence naming exactly what is needed"
 ```
 
 Without this, a card waiting on a question sits in `todo/` or `in-progress/` looking like available work, and the next session picks it up and asks the same question again. That is the drift this project exists to prevent, reproduced inside the board itself.
+
+### Documentation drift and stale items
+
+When documentation changes beneath an active item and immediate reconciliation is blocked or unconfirmed:
+- The item is flagged in place, never deleted.
+- Frontmatter gains `drift_status: "flagged"`, with `assigned_role: "user"` and `blocked_on` explaining the shift.
+- A `### Drift Warning` block is added to the notes recording what changed beneath it.
