@@ -21,6 +21,8 @@ That last point is the sharpest. **The model's general knowledge is excellent an
 
 There are good projects that teach an agent *how* to work — test-driven development, systematic debugging, writing a plan. Agent Assemble does not compete with them and does not restate them. Where such a skill already teaches a practice well, this one points at it.
 
+Other projects in this space ship skills that teach an agent how to work inside one specific product. This one teaches how a company works, independent of any single product.
+
 Agent Assemble answers the questions those cannot: **who is doing this, where does the work stand, and what has already happened.**
 
 ## The shape
