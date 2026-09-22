@@ -27,3 +27,4 @@ For procedural instructions, see [references/relay-roles.md](references/relay-ro
 
 1. **Card as vehicle:** A role reads prior sections and records findings, diffs, or test evidence in its designated section before handoff.
 2. **Atomic log by-product:** Moving a card without an accompanying entry in `log/LOG.md` invalidates the transition; receiving roles must reject it back immediately.
+3. **Sabotage evidence:** Each criterion needs a test, mutation, resolved outcome. See `board/references/sabotage-evidence-guide.md`.
