@@ -220,3 +220,20 @@ jobs:
           # present in full and absent in partial.
           bash scripts/check-inheritance-proof.sh
 
+      - name: Verify three-mode principle system on good and bad fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Good sweep: fixtures/principles must pass, proving the four checks work.
+          bash scripts/check-principles.sh fixtures/principles
+
+          # Bad-fixture sweep: fixtures/principles/bad must exit non-zero, proving
+          # the violations (a Prescriptive principle in the advisory-only fixture
+          # and a verdict in the perspective fixture) are detected.
+          # The inversion below turns a non-zero exit into zero and vice versa, so
+          # the step fails if the bad fixture unexpectedly passes the check.
+          if bash scripts/check-principles.sh fixtures/principles/bad 2>/dev/null; then
+            echo "Bad fixture passed check-principles.sh — violations are not being detected." >&2
+            exit 1
+          fi
+
