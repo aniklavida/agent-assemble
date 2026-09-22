@@ -167,3 +167,56 @@ jobs:
             echo "Bad fixture passed check-workflow-override.sh — missing override files are not being detected." >&2
             exit 1
           fi
+
+      - name: Measure composed budget for the three-level Node.js role
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The three cores (software-engineer + backend-developer + nodejs) are
+          # composed and counted together. The ceiling is 600 words. A three-level
+          # composition that fits proves the vertical slice is deployable.
+          bash scripts/check-composed-budget.sh \
+            employees/software-engineer/backend-developer/nodejs 600
+
+      - name: Check for duplicate sentences across role cores
+        shell: bash
+        run: |
+          set -euo pipefail
+          # No sentence may appear verbatim in two role cores. The good sweep
+          # covers the shipped employees/ tree. The bad-fixture sweep must fail,
+          # proving that deliberate duplication is detected.
+          bash scripts/check-duplicate-sentences.sh employees
+
+          # Bad-fixture sweep: fixtures/duplicate-sentences/bad contains two
+          # SKILL.md files with a shared sentence. Must exit non-zero.
+          if bash scripts/check-duplicate-sentences.sh \
+               fixtures/duplicate-sentences/bad 2>/dev/null; then
+            echo "Bad fixture passed check-duplicate-sentences.sh — duplicates are not being detected." >&2
+            exit 1
+          fi
+
+      - name: Verify fourth-level composition boundary enforcement
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Adding a fourth level to the three-level slice produces a composed
+          # budget that exceeds the 600-word ceiling. The script must exit non-zero,
+          # proving that an overflowing fourth level is blocked loudly.
+          if bash scripts/check-composed-budget.sh \
+               fixtures/vertical-slice/fourth-level/nodejs/specialised-runtime \
+               600 2>/dev/null; then
+            echo "Fourth-level composition passed the budget check — overflow is not being detected." >&2
+            exit 1
+          fi
+
+      - name: Prove inheritance is load-bearing for the Node.js vertical slice
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Removing Backend Developer from the composition must change the
+          # composed role's behaviour: the licence-policy instruction disappears.
+          # This script composes the full three-level role and a partial two-level
+          # role (backend-developer omitted) and confirms the difference is
+          # present in full and absent in partial.
+          bash scripts/check-inheritance-proof.sh
+
