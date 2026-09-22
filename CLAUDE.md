@@ -20,8 +20,9 @@ project's decisions, this organisation's definition of done.
 ## Writing a node
 
 - A small always-loaded core and references for everything else. The ceiling
-  is planned rather than enforced — see the word budget section of
-  `CONTRIBUTING.md` for the measured counts and why there is no number yet.
+  is 200 words for the always-loaded core, enforced by `scripts/check-word-budget.sh`
+  on every push and pull request — see the word budget section of `CONTRIBUTING.md`
+  for measured counts and the rationale.
 - No instruction may appear in two files. If it seems to need to, one of them
   should point at the other.
 - No node restates its parent. If it does, the inheritance is decorative and

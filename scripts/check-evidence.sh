@@ -4,9 +4,11 @@
 # A completed item is any card with status: "done" and size other than "direct".
 # Direct-path items bypass the SQA gate and carry no sabotage obligation.
 # For each acceptance criterion in a checked card, the script requires:
-#   - A named test (test: field not blank)
-#   - A mutation (mutation: field not blank)
+#   - A named test (test: field not blank or only whitespace)
+#   - A mutation (mutation: field not blank or only whitespace)
 #   - No unresolved sabotage-passed entries (sabotage_passed: "unresolved")
+#   - Every criterion in the Acceptance Criteria list has a matching evidence block
+#   - Every evidence block names a criterion that appears in the Acceptance Criteria list
 #
 # Items in the fixture's "bad" directory are excluded from the normal sweep;
 # they are only checked when this script is called with that directory explicitly.
@@ -37,13 +39,34 @@ check_file() {
 
   # Parse criterion blocks. Each criterion block is expected to contain:
   #   criterion: "..."
-  #   test: "..."       ← must be non-blank
-  #   mutation: "..."   ← must be non-blank
+  #   test: "..."       ← must be non-blank (after trimming whitespace)
+  #   mutation: "..."   ← must be non-blank (after trimming whitespace)
   #   sabotage_outcome: "pass | fail | unresolved"
   #   sabotage_cause: "..."    ← required when sabotage_outcome is "pass"
 
-  # Extract the Sabotage Evidence section and scan for structural problems.
-  # We look for lines that indicate a criterion entry.
+  # ── Pass 1: collect acceptance criteria from "## Acceptance Criteria" ────────
+  # Checked criteria are lines of the form: - [x] Some criterion text
+  # We store each criterion text in a newline-separated variable.
+
+  ac_criteria=""
+  in_ac=0
+
+  while IFS= read -r line; do
+    case "$line" in
+      "## Acceptance Criteria"*) in_ac=1; continue ;;
+      "## "*) in_ac=0; continue ;;
+    esac
+    [ "$in_ac" -eq 0 ] && continue
+    case "$line" in
+      "- [x] "*)
+        ctext=$(printf '%s' "$line" | sed 's/^- \[x\] //')
+        ac_criteria="${ac_criteria}${ctext}
+"
+        ;;
+    esac
+  done < "$file"
+
+  # ── Pass 2: parse evidence blocks ────────────────────────────────────────────
 
   in_evidence=0
   criterion_label=""
@@ -54,13 +77,15 @@ check_file() {
   criterion_count=0
   pending_check=0
 
-  # We process line by line, detecting YAML-list-style evidence blocks.
+  # evidence_labels: newline-separated list of criterion names seen in evidence
+  evidence_labels=""
+
   while IFS= read -r line; do
 
     # Detect entry into the Sabotage Evidence section
     case "$line" in
       "## Sabotage Evidence"*) in_evidence=1; continue ;;
-      "## "*) 
+      "## "*)
         if [ "$in_evidence" -eq 1 ]; then
           # Leaving the section — flush any pending criterion
           if [ "$pending_check" -eq 1 ]; then
@@ -88,6 +113,8 @@ check_file() {
         cause_val=""
         criterion_count=$((criterion_count + 1))
         pending_check=1
+        evidence_labels="${evidence_labels}${criterion_label}
+"
         ;;
       "  test:"*)
         test_val=$(printf '%s' "$line" | sed 's/^[[:space:]]*test:[[:space:]]*//' | tr -d '"')
@@ -114,7 +141,49 @@ check_file() {
   if [ "$criterion_count" -eq 0 ]; then
     echo "FAIL: $file — status is \"done\" but contains no Sabotage Evidence section" >&2
     FAILED=1
+    return 0
   fi
+
+  # ── Cross-check: every acceptance criterion must have an evidence block ───────
+  # Iterate over each AC criterion and confirm it appears in evidence_labels.
+  # "appears" means an evidence block whose criterion: field exactly matches.
+
+  IFS="
+"
+  for ac_line in $ac_criteria; do
+    [ -z "$ac_line" ] && continue
+    # Search evidence_labels line by line for an exact match
+    found=0
+    for ev_line in $evidence_labels; do
+      [ -z "$ev_line" ] && continue
+      if [ "$ev_line" = "$ac_line" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      echo "FAIL: $file — acceptance criterion \"$ac_line\" has no matching sabotage evidence block" >&2
+      FAILED=1
+    fi
+  done
+
+  # ── Cross-check: every evidence block must name a criterion in the AC list ───
+  for ev_line in $evidence_labels; do
+    [ -z "$ev_line" ] && continue
+    found=0
+    for ac_line in $ac_criteria; do
+      [ -z "$ac_line" ] && continue
+      if [ "$ac_line" = "$ev_line" ]; then
+        found=1
+        break
+      fi
+    done
+    if [ "$found" -eq 0 ]; then
+      echo "FAIL: $file — evidence block names \"$ev_line\" which is not in the Acceptance Criteria list (stale evidence)" >&2
+      FAILED=1
+    fi
+  done
+  unset IFS
 
   return 0
 }
@@ -131,12 +200,16 @@ _flush_criterion() {
 
   _ok=0
 
-  if [ -z "$_test" ]; then
+  # Trim leading/trailing whitespace before checking for emptiness
+  _test_trimmed=$(printf '%s' "$_test" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+  _mutation_trimmed=$(printf '%s' "$_mutation" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+  if [ -z "$_test_trimmed" ]; then
     echo "FAIL: $_file — criterion \"$_label\" has no named test (test: field is blank)" >&2
     _ok=1
   fi
 
-  if [ -z "$_mutation" ]; then
+  if [ -z "$_mutation_trimmed" ]; then
     echo "FAIL: $_file — criterion \"$_label\" has no mutation (mutation: field is blank)" >&2
     _ok=1
   fi
@@ -150,7 +223,8 @@ _flush_criterion() {
     _ok=1
   elif [ "$_outcome" = "pass" ]; then
     # A passing sabotage must name its cause
-    if [ -z "$_cause" ]; then
+    _cause_trimmed=$(printf '%s' "$_cause" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    if [ -z "$_cause_trimmed" ]; then
       echo "FAIL: $_file — criterion \"$_label\" sabotage passed but sabotage_cause is blank — must name the independent safeguard, explain the build-failure status, or state the test never reached that code" >&2
       _ok=1
     fi
