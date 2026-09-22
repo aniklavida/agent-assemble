@@ -115,3 +115,55 @@ jobs:
             echo "Bad fixtures passed check-evidence.sh — violations are not being detected." >&2
             exit 1
           fi
+
+      - name: Verify role skeleton check on good and bad fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Normal sweep: fixtures/role-skeleton/good must pass.
+          bash scripts/check-role-skeleton.sh fixtures/role-skeleton/good
+
+          # Bad-fixture sweep: fixtures/role-skeleton/bad must exit non-zero.
+          # The inversion below turns a non-zero exit into zero and vice versa, so
+          # the step fails if the bad fixture unexpectedly passes the check.
+          if bash scripts/check-role-skeleton.sh fixtures/role-skeleton/bad 2>/dev/null; then
+            echo "Bad fixture passed check-role-skeleton.sh — missing sections are not being detected." >&2
+            exit 1
+          fi
+
+      - name: Verify workflow data check on good and bad fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Normal sweep: fixtures/workflows-as-data must pass.
+          bash scripts/check-workflow-data.sh fixtures/workflows-as-data security-review
+
+          # Bad-fixture sweep: a fixture with modified SKILL.md must exit non-zero.
+          # The inversion below turns a non-zero exit into zero and vice versa, so
+          # the step fails if the bad fixture unexpectedly passes the check.
+          mkdir -p /tmp/check_workflow_bad/workflow /tmp/check_workflow_bad/log
+          cp fixtures/workflows-as-data/workflow/workflows.md /tmp/check_workflow_bad/workflow/
+          cp fixtures/workflows-as-data/workflow/SKILL.md /tmp/check_workflow_bad/workflow/SKILL.md
+          echo "# MODIFIED" >> /tmp/check_workflow_bad/workflow/SKILL.md
+          if bash scripts/check-workflow-data.sh /tmp/check_workflow_bad security-review 2>/dev/null; then
+            echo "Bad fixture passed check-workflow-data.sh — SKILL.md modifications are not being detected." >&2
+            exit 1
+          fi
+
+      - name: Verify workflow override check on good and bad fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Normal sweep: fixtures/override-resolution must pass.
+          bash scripts/check-workflow-override.sh fixtures/override-resolution BA
+
+          # Bad-fixture sweep: a fixture missing the override file must exit non-zero.
+          # The inversion below turns a non-zero exit into zero and vice versa, so
+          # the step fails if the bad fixture unexpectedly passes the check.
+          mkdir -p /tmp/check_override_bad/.agent-assemble/roles/BA /tmp/check_override_bad/employees/BA /tmp/check_override_bad/log
+          cp fixtures/override-resolution/employees/BA/SKILL.md /tmp/check_override_bad/employees/BA/
+          cp fixtures/override-resolution/log/LOG.md /tmp/check_override_bad/log/
+          if bash scripts/check-workflow-override.sh /tmp/check_override_bad BA 2>/dev/null; then
+            echo "Bad fixture passed check-workflow-override.sh — missing override files are not being detected." >&2
+            exit 1
+          fi
