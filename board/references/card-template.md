@@ -21,6 +21,26 @@ Originating user request or problem description.
 - [ ] Criterion 1
 - [ ] Criterion 2
 
+## Sabotage Evidence
+
+<!-- One block per acceptance criterion. Direct-path items omit this section. -->
+<!-- For sabotage_outcome use: "fail" | "pass" | "unresolved"               -->
+<!-- sabotage_cause is required when sabotage_outcome is "pass".            -->
+<!-- An item may not close while any entry is "unresolved".                 -->
+<!-- See board/references/sabotage-evidence-guide.md for the three causes.  -->
+
+- criterion: Criterion 1
+  test: ""
+  mutation: ""
+  sabotage_outcome: ""
+  sabotage_cause: ""
+
+- criterion: Criterion 2
+  test: ""
+  mutation: ""
+  sabotage_outcome: ""
+  sabotage_cause: ""
+
 ## Handoff Trail
 
 ### Analysis Handoff (BA)
@@ -39,10 +59,7 @@ Originating user request or problem description.
 - Verification check:
   - Command run: `verification command`
   - Result: `pass/fail details`
-- Sabotage check:
-  - Mutation introduced: `inverted assertion or broken logic`
-  - Sabotage test outcome: `confirmed test failure`
-  - Restoration check: `restored working state and confirmed test passes`
+- Sabotage check: see Sabotage Evidence section above
 - Verdict: `APPROVED | RETURNED`
 
 ### Acceptance Sign-off (PM)

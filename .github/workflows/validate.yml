@@ -98,3 +98,20 @@ jobs:
           # The fixture is the only evidence this procedure produces the outcome it
           # describes. A check nothing runs is a check that does not exist.
           bash scripts/verify-drift-reconciliation.sh
+
+      - name: Verify per-criterion sabotage evidence on completed task items
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Normal sweep: board/ and fixtures/ excluding the bad-fixture directory.
+          # Every done, non-direct item must carry a named test, a named mutation,
+          # and a resolved sabotage outcome per acceptance criterion.
+          bash scripts/check-evidence.sh
+
+          # Bad-fixture sweep: must exit non-zero, proving violations are detected.
+          # The inversion below turns a non-zero exit into zero and vice versa, so
+          # the step fails if the bad fixtures unexpectedly pass the check.
+          if bash scripts/check-evidence.sh fixtures/sabotage-evidence/bad 2>/dev/null; then
+            echo "Bad fixtures passed check-evidence.sh — violations are not being detected." >&2
+            exit 1
+          fi
