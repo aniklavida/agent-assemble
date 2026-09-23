@@ -27,8 +27,9 @@ Updated: YYYY-MM-DD
 
 ## The Plumbing
 
-**Board backend:** [Markdown | Obsidian | SQLite | External tracker — name it]
+**Board backend:** [Markdown | Obsidian | Linear]
 **Board root:** [path, e.g. board/ or vault/tasks/]
+**Board connected to existing:** [true — found and connected | false — created new]
 **Board name:** [human-readable name for the board]
 **Branch base:** [e.g. develop or main]
 **Branch prefix:** [e.g. feature/ or none]

@@ -1,16 +1,45 @@
-# Board Adapters Specification
+# Board Adapters
 
-This reference describes how the board contract connects to different storage backends without duplicating existing work tracking systems.
+This reference defines the storage-agnostic contract and the rules every backend
+obeys. The operations themselves are specified once in
+[`../SKILL.md`](../SKILL.md); this file gives the contract semantics, the
+persistence file, and the two rules a setup must not break.
 
-## Configuration Pointer
+## Contract Semantics
 
-When Agent Assemble initializes in a repository, it consults `.agent-assemble/board-config.md`. If absent, the default Markdown directory backend is assumed.
+A card is identified by `id`. Its contract state is the tuple:
 
-Example configuration:
+```
+(id, title, size, status, assigned_role, updated_at, body)
+```
+
+Every backend must make these four operations observably equivalent:
+
+| Operation | Input | Observable result |
+|---|---|---|
+| **Create Card** | id, title, size, body | A readable card with `status: "todo"` |
+| **Move Card** | id, target status, next `assigned_role` | `Read Card` reports the new status and role |
+| **Read Card** | id | The tuple above, backend-independent |
+| **Append Log** | id, event, role, summary, next state | One new row; prior rows unchanged |
+
+Two backends are equivalent when the same operation sequence produces the same
+tuple, regardless of how the bytes are stored. That is what
+[`scripts/check-board-adapters.sh`](../../scripts/check-board-adapters.sh)
+verifies.
+
+**Atomic handoff.** `Move Card` and `Append Log` are called as one handoff, in
+either order, but a card that moves without its log row is invalid: the receiving
+role rejects it back. See [`log/references/log-schema.md`](../../log/references/log-schema.md).
+
+## Persistence — `.agent-assemble/board-config.md`
+
+The chosen backend is written once at setup and read on every later run. The
+user is never asked twice.
 
 ```yaml
-backend: "markdown"
-root: "board"
+backend: "markdown"          # markdown | obsidian | linear
+root: "board"                # location of the board (path or external target)
+existing: true               # true = connected to a board already present
 status_mapping:
   todo: "todo"
   in-progress: "in-progress"
@@ -18,51 +47,50 @@ status_mapping:
   done: "done"
 ```
 
-## Supported Adapters
+If the file is absent, setup has not run. **Absence is not permission to default
+to Markdown** — it means ask.
 
-### 1. Markdown Directory Adapter (Default)
+## Rule 1 — Connect, never create a second source of truth
 
-Requires file tools only; zero external dependencies.
+Before writing any board, inspect in this order:
 
-- **Layout:** Directory per status column (`board/todo/`, `board/in-progress/`, `board/testing/`, `board/done/`).
-- **Create:** Write a new `.md` file in `board/todo/` using `TASK-XXX.md`.
-- **Read:** Read file content using standard file tools.
-- **Move:** Execute a file move (`mv board/todo/TASK-XXX.md board/in-progress/`) and synchronize frontmatter `status:` and `updated_at:`.
-- **List:** Inspect column directories (`ls board/*/`).
+1. `.agent-assemble/board-config.md` — a backend was already chosen. Connect.
+2. A card tree (`board/{todo,in-progress,testing,done}/` with cards). Connect as
+   `backend: markdown`.
+3. An Obsidian vault (a directory containing `.obsidian/`). Connect as
+   `backend: obsidian`.
+4. An existing external board (a Linear team/project already in use). Connect as
+   `backend: linear`.
 
-### 2. Obsidian Vault Adapter
+If any check matches, **connect to it and write `existing: true`**. Creating a
+second board for the same work is the failure this project exists to prevent.
+[`scripts/check-board-connect-existing.sh`](../../scripts/check-board-connect-existing.sh)
+proves the connect path and that no duplicate appears.
 
-Operates across standard Markdown vaults.
+## Rule 2 — State reachability at the moment of choosing
 
-- **Layout:** Vault folder specified by `root:` (e.g., `vault/tasks/`).
-- **Create:** Create `.md` note inside the designated vault tasks directory.
-- **Move:** Either move files between status folders or update frontmatter `status:` tags queried by Dataview/Kanban.
-- **Requirements:** Filesystem tools only.
+Backends differ in what the host must provide:
 
-### 3. SQLite Adapter
+| Backend | What the agent needs |
+|---|---|
+| Markdown | file tools only — works in every host |
+| Obsidian | file tools; a vault is Markdown |
+| Linear | an MCP server or an API key — **not available in every host** |
 
-Operates against a local SQLite database for projects preferring structured relational storage.
+The Linear row may be unreachable. Say so **when the backend is chosen**, never
+later: if neither a Linear MCP server nor a configured API key is present, setup
+refuses the choice, names the missing capability, and offers Markdown or Obsidian
+instead. The agent never reads, prints, or stores the key; it checks only that
+the capability exists. [`scripts/check-board-reachability.sh`](../../scripts/check-board-reachability.sh)
+proves the refusal and its reason.
 
-- **Schema:**
-  ```sql
-  CREATE TABLE IF NOT EXISTS board_cards (
-    id TEXT PRIMARY KEY,
-    title TEXT NOT NULL,
-    size TEXT NOT NULL,
-    status TEXT NOT NULL,
-    assigned_role TEXT NOT NULL,
-    body TEXT NOT NULL,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-  );
-  ```
-- **Operations:** Executed via `sqlite3` CLI commands.
-- **Requirement:** A working shell with `sqlite3` binary available.
+## Backend pages
 
-### 4. External Tracker Adapter (Issue Trackers)
+Each backend is a page of instructions, not a project:
 
-Connects to existing external issue trackers (GitHub Issues, Linear, Jira).
+- [adapters/markdown.md](adapters/markdown.md) — file tools only.
+- [adapters/obsidian.md](adapters/obsidian.md) — a vault is Markdown, with conventions.
+- [adapters/linear.md](adapters/linear.md) — MCP or API key; not in every host.
 
-- **Principle:** Agent Assemble maps its internal relay roles to tracker issue fields, labels, or projects rather than creating separate shadow files.
-- **Operations:** Invoked via host MCP tools or platform CLI binaries (e.g., `gh issue create`, `gh issue edit`).
-- **Host Availability Requirement:** If an external tracker is configured but the host agent lacks the necessary CLI or MCP tools, setup fails fast and falls back to the Markdown backend.
+SQLite was described in earlier drafts but is **planned, not implemented**; it is
+not offered by setup.
