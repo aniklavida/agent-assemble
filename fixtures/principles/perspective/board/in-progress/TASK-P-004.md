@@ -27,5 +27,13 @@ Export the report data table to CSV on user request.
   and were the findings recorded?
 - MAY ask: does the CSV-building logic in `csv.js` duplicate logic already in
   the report renderer, or is the shared path intentional?
+- MAY ask [Security]: is anything in this change committed that should not be —
+  a secret, credential or machine path — and does the `csv-writer` helper's
+  licence match the policy recorded for this project?
+- MAY ask [Performance]: does export time or memory scale with the number of
+  visible rows in a way nobody measured, and was "fine on my machine" measured
+  on a small table only?
+- MAY ask [Researcher]: has anyone actually checked that `csv-writer` behaves as
+  its summary claims at the pinned version, by opening its source?
 
 These are questions, not verdicts. The reviewer decides what to do with each.

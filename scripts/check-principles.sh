@@ -1,12 +1,16 @@
 #!/bin/sh
 # check-principles.sh — verify the three-mode principle system.
 #
-# Checks four properties that the three-mode design must satisfy:
+# Checks six properties that the three-mode design must satisfy:
 #
 #   1. A card at the SQA gate with a prescriptive principle unevidenced is blocked.
 #   2. A card at the SQA gate with the same principle deselected is not blocked.
 #   3. Advisory principles never block, regardless of evidence.
 #   4. Perspective blocks produce questions, not verdicts.
+#   5. Each shipped perspective (Security, Performance, Researcher) contributes a
+#      MAY ask question, and a corrupted card that adds a MUST/BLOCKED verdict is
+#      rejected.
+#   6. The shipped perspective role files ask and produce no verdict.
 #
 # Mode 5 — detection — is invoked separately:
 #   scripts/check-principles.sh --detect <dir>
@@ -15,8 +19,8 @@
 # confirmation.  Always exits 0 (detection never blocks).
 #
 # Usage:
-#   scripts/check-principles.sh                          # runs all four fixture checks
-#   scripts/check-principles.sh <fixture-root>           # runs all four against a given root
+#   scripts/check-principles.sh                          # runs all fixture checks
+#   scripts/check-principles.sh <fixture-root>           # runs all checks against a given root
 #   scripts/check-principles.sh --detect <dir>           # detection mode
 #
 # Exit status:
@@ -100,6 +104,36 @@ principle_has_mode() {
   # Look for a table row: | <principle> | <family> | <mode> |
   # The principle and mode values must appear on the same line
   if grep -i "| *$_principle *|" "$_principles_file" | grep -qi "| *$_mode *|"; then
+    return 0
+  fi
+  return 1
+}
+
+# ── helper: perspective predicates ────────────────────────────────────────────
+
+# The three review perspectives this project ships, as
+# <dir-slug>:<question-marker>:<principle-name>. Security, Performance and
+# Researcher each ask; none of them blocks or produces a verdict.
+PERSPECTIVE_SPECS="security:Security:Leak Scan
+performance:Performance:Cost Scaling
+researcher:Researcher:Claim Verification"
+
+# perspective_card_has_question <card> <marker>
+# 0 if the card contains a "MAY ask [<marker>]" question.
+perspective_card_has_question() {
+  _card="$1"
+  _marker="$2"
+  [ -f "$_card" ] || return 1
+  grep -qF "MAY ask [$_marker]" "$_card"
+}
+
+# perspective_card_has_verdict <card>
+# 0 if the card contains a standalone MUST/BLOCKED verdict marker. A "MAY ask"
+# line is exempt: the marker must be a verdict, not a question.
+perspective_card_has_verdict() {
+  _card="$1"
+  [ -f "$_card" ] || return 1
+  if grep -E "^(BLOCKED|verdict: BLOCKED|verdict: FAIL|MUST.*(fail|block|reject))" "$_card" 2>/dev/null | grep -v "MAY ask" | grep -q .; then
     return 0
   fi
   return 1
@@ -214,9 +248,29 @@ else
     echo "PASS (perspective): card contains a question (MAY ask), not a verdict."
   fi
 
+  # Each shipped review perspective contributes its own MAY-mode question, and
+  # its principle is recorded as Perspective mode.
+  while IFS=: read -r _slug _marker _principle; do
+    [ -z "$_slug" ] && continue
+    if perspective_card_has_question "$PERSPECTIVE_CARD" "$_marker"; then
+      echo "PASS (perspective/$_slug): card contains a 'MAY ask [$_marker]' question."
+    else
+      echo "FAIL (perspective/$_slug): card has no 'MAY ask [$_marker]' question." >&2
+      FAILED=1
+    fi
+    if principle_has_mode "$PERSPECTIVE_PRINCIPLES" "$_principle" "Perspective"; then
+      echo "PASS (perspective/$_slug): '$_principle' recorded as Perspective mode."
+    else
+      echo "FAIL (perspective/$_slug): principles.md does not record '$_principle' as Perspective." >&2
+      FAILED=1
+    fi
+  done <<PERSPECTIVES
+$PERSPECTIVE_SPECS
+PERSPECTIVES
+
   # A perspective card must not contain MUST or BLOCKED markers as a verdict
   # (a MUST inside a quoted example is acceptable; we look for standalone verdicts)
-  if grep -E "^(BLOCKED|verdict: BLOCKED|verdict: FAIL|MUST.*(fail|block|reject))" "$PERSPECTIVE_CARD" 2>/dev/null | grep -v "MAY ask" | grep -q .; then
+  if perspective_card_has_verdict "$PERSPECTIVE_CARD"; then
     echo "FAIL (perspective): card contains a verdict — perspective must not block." >&2
     FAILED=1
   else
@@ -231,6 +285,62 @@ else
     echo "PASS (perspective): principles.md correctly records Perspective mode."
   fi
 fi
+
+# ── Check 5: each review perspective rejects a question turned into a verdict ─
+
+# The bad fixtures corrupt one perspective card per role: the MAY ask question is
+# still present, but a MUST or BLOCKED verdict was added. The same predicate that
+# accepts the good card must reject each of these. Paths are relative to the
+# repository root, so the check runs identically for both fixture roots.
+while IFS=: read -r _slug _marker _principle; do
+  [ -z "$_slug" ] && continue
+  _bad_dir="fixtures/principles/bad/perspective-$_slug"
+  _bad_card=$(find "$_bad_dir/board/in-progress" -name "*.md" 2>/dev/null | head -1)
+  if [ -z "$_bad_card" ] || [ ! -f "$_bad_card" ]; then
+    echo "FAIL (bad/perspective-$_slug): no corrupted card found in $_bad_dir." >&2
+    FAILED=1
+    continue
+  fi
+  # The corruption keeps its question, so rejection is caused by the verdict and
+  # not by the question having been deleted.
+  if ! perspective_card_has_question "$_bad_card" "$_marker"; then
+    echo "FAIL (bad/perspective-$_slug): corrupted card no longer asks its question — fixture is not the intended shape." >&2
+    FAILED=1
+  elif perspective_card_has_verdict "$_bad_card"; then
+    echo "PASS (bad/perspective-$_slug): verdict marker detected — corrupted question is rejected."
+  else
+    echo "FAIL (bad/perspective-$_slug): no MUST/BLOCKED verdict detected — corruption would pass the check." >&2
+    FAILED=1
+  fi
+done <<PERSPECTIVES
+$PERSPECTIVE_SPECS
+PERSPECTIVES
+
+# ── Check 6: the shipped perspective roles ask and never block ────────────────
+
+# The employee role files themselves must obey the same property: each contains
+# a MAY ask question and no MUST/BLOCKED verdict. File structure alone is not
+# evidence that a perspective role is perspective-only.
+while IFS=: read -r _slug _marker _principle; do
+  [ -z "$_slug" ] && continue
+  _role_file="employees/$_slug/SKILL.md"
+  if [ ! -f "$_role_file" ]; then
+    echo "FAIL (role/$_slug): role file not found at $_role_file." >&2
+    FAILED=1
+    continue
+  fi
+  if ! grep -q "MAY ask" "$_role_file"; then
+    echo "FAIL (role/$_slug): role file contains no MAY ask question." >&2
+    FAILED=1
+  elif perspective_card_has_verdict "$_role_file"; then
+    echo "FAIL (role/$_slug): role file contains a MUST/BLOCKED verdict — a perspective must not block." >&2
+    FAILED=1
+  else
+    echo "PASS (role/$_slug): role file asks (MAY ask) and produces no verdict."
+  fi
+done <<PERSPECTIVES
+$PERSPECTIVE_SPECS
+PERSPECTIVES
 
 # ── Final result ──────────────────────────────────────────────────────────────
 

@@ -41,7 +41,8 @@ Software Engineer
 Business Analyst
 Project Manager
 SQA
-Security Handler
+Security
+Performance
 Researcher
 ```
 
@@ -221,6 +222,15 @@ determine. Ten questions become four.
 Some answers do not exist yet. Setup therefore ends by writing two lists into
 documentation: what is decided, and what is deliberately deferred. The second
 list is knowledge, not a gap.
+
+## The founding incident
+
+Perspectives exist because of a failure class neither an advisory reminder nor a
+prescriptive gate can reach. A product premise was built on an unverified claim
+about an upstream project and survived until someone finally opened the
+repository. The claim was never a gate item, so nothing failed — nobody had asked
+whether anyone had actually checked it. Security, Performance and Researcher are
+the perspective roles built for that question; each asks and never blocks.
 
 ## The claim, and its limit
 
