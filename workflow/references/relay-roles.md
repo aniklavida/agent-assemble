@@ -1,68 +1,57 @@
 # Relay Role Instructions
 
-This reference describes the procedural steps for each named placeholder role across the relay.
+This reference links each relay role to its canonical role file and summarises
+the procedural steps it contributes to the relay.
+
+Role files are the authoritative source; this document must not restate them.
 
 ## Project Manager (PM)
 
-1. **Intake & Sizing:**
-   - Receive the user request.
-   - Consult [sizing-rubric.md](sizing-rubric.md) to classify as Direct, Short, or Full.
-   - For Direct: route directly to Employee or execute immediately.
-   - For Short: route to BA with instructions to write criteria into a task card.
-   - For Full: route to BA with instructions to initiate requirements elicitation.
+Role file: [employees/project-manager/SKILL.md](../../employees/project-manager/SKILL.md)
 
-2. **Closure & Gatekeeping:**
-   - Verify that all acceptance criteria are marked complete.
-   - Verify that the log trail in `log/LOG.md` contains unbroken records for every role transition.
-   - Move the task card from `board/testing/` to `board/done/`.
-   - Atomically append `CARD_CLOSED` (or `DIRECT_CLOSED`) to `log/LOG.md`.
+1. **Intake & Sizing:** Receive the user request and classify as Direct, Short,
+   or Full using [sizing-rubric.md](sizing-rubric.md).
+   - Direct: route to Employee; no BA, no SQA gate.
+   - Short: route to BA for card criteria only; no plan document.
+   - Full: route to BA to elicit, plan, then create card.
+
+2. **Closure:** Audit `log/LOG.md` for an unbroken trail, move the card to
+   `board/done/`, and append `CARD_CLOSED` (or `DIRECT_CLOSED` for Direct).
 
 ## Business Analyst (BA)
 
-1. **Elicitation (Full path only):**
-   - Identify ambiguous assumptions or unstated constraints.
-   - Ask clarifying questions before writing code or plans.
+Role file: [employees/business-analyst/SKILL.md](../../employees/business-analyst/SKILL.md)
 
-2. **Planning (Full path only):**
-   - Author a durable plan document under `documentation/plans/`.
-   - Verify existing plans and decisions for potential drift.
-
-3. **Card Creation (Short and Full paths):**
-   - Formulate unambiguous, verifiable acceptance criteria.
-   - Create a task card in `board/todo/` following the schema in `board/SKILL.md`.
-   - Atomically append `CARD_CREATED` to `log/LOG.md`.
-   - Hand off to Employee.
+1. **Elicitation (Full path only):** Surface assumptions; ask clarifying
+   questions before writing a plan.
+2. **Planning (Full path only):** Author a durable plan in `documentation/plans/`.
+3. **Card Creation (Short and Full):** Write unambiguous criteria; create the
+   task card in `board/todo/` with the required frontmatter fields from
+   `board/references/card-template.md`; append `CARD_CREATED` to `log/LOG.md`.
 
 ## Employee
 
-1. **Acquisition:**
-   - Read the assigned task card from `board/todo/`.
-   - Update frontmatter status to `in-progress` and move the file into `board/in-progress/`.
-   - Atomically append `WORK_STARTED` to `log/LOG.md`.
+The employee role is determined by the card's `assigned_role` field. For the
+Software Engineer vertical slice, see
+[employees/software-engineer/SKILL.md](../../employees/software-engineer/SKILL.md)
+and its descendants.
 
-2. **Implementation:**
-   - Execute the necessary edits and adjustments using local tools.
-   - Run self-verification tests to confirm the changes satisfy the criteria.
+1. **Acquisition:** Read the card; move to `board/in-progress/`; append
+   `WORK_STARTED` to `log/LOG.md`.
+2. **Implementation:** Execute the task; run self-verification.
+3. **Handoff:** Fill `### Implementation Handoff`; move card to
+   `board/testing/`; append `WORK_COMPLETED` to `log/LOG.md`.
 
-3. **Handoff:**
-   - Fill the `### Implementation Handoff` section inside the task card with:
-     - Modified file paths.
-     - Implementation rationale and key decisions.
-     - Self-verification commands and results.
-   - Move the file to `board/testing/`.
-   - Atomically append `WORK_COMPLETED` to `log/LOG.md`.
-   - Hand off to SQA.
+## SQA
 
-## Software Quality Assurance (SQA)
+Role file: [employees/sqa/SKILL.md](../../employees/sqa/SKILL.md)
 
-1. **Intake:**
-   - Read the task card in `board/testing/`, specifically reviewing acceptance criteria and implementation notes.
-
-2. **Independent Verification:**
-   - Run verification tests against the modified code.
-   - Perform a sabotage test: deliberately introduce a break or invert an assertion to verify that tests fail when broken. Then restore working code. A test that passes when the implementation is broken proves nothing.
-
-3. **Handoff / Rejection:**
-   - Document verification results and sabotage test evidence inside `### Verification Handoff` in the task card.
-   - If criteria pass: update status to `testing`, assign to PM, and atomically append `VERIFICATION_PASSED` to `log/LOG.md`.
-   - If criteria fail: move the file back to `board/in-progress/`, reassign to Employee with explicit defect notes, and atomically append `VERIFICATION_FAILED` to `log/LOG.md`.
+1. **Intake:** Read the card in `board/testing/`, reviewing criteria and
+   the implementation handoff.
+2. **Independent Verification:** Verify each criterion independently. Run the
+   per-criterion sabotage discipline with the three-outcome rule as described
+   in the role file and `board/references/sabotage-evidence-guide.md`.
+3. **Handoff / Rejection:** Fill `### Verification Handoff`. On pass, append
+   `VERIFICATION_PASSED` and assign to PM. On fail, move back to
+   `board/in-progress/`, reassign to Employee, and append
+   `VERIFICATION_FAILED` to `log/LOG.md`.
