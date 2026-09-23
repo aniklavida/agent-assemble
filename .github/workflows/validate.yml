@@ -237,3 +237,80 @@ jobs:
             exit 1
           fi
 
+      - name: Verify SQA sabotage evidence fixtures (good passes, bad fails)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Good fixture: a card with complete per-criterion evidence must pass.
+          bash scripts/check-evidence.sh fixtures/sqa-role/good
+
+          # Bad fixture: a card with blank test/mutation/outcome must fail.
+          # The inversion below turns a non-zero exit into zero and vice versa, so
+          # the step fails if the bad fixture unexpectedly passes.
+          if bash scripts/check-evidence.sh fixtures/sqa-role/bad 2>/dev/null; then
+            echo "Bad SQA fixture passed check-evidence.sh — missing evidence is not being detected." >&2
+            exit 1
+          fi
+
+      - name: Verify PM sizing-gate fixtures pass the evidence check
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Direct-path cards carry no sabotage obligation; full-path cards must
+          # carry per-criterion evidence. Both fixtures in sizing-gate/ must pass.
+          bash scripts/check-evidence.sh fixtures/sizing-gate
+
+      - name: Verify PM sizing-gate enforcement on good and bad fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Normal sweep: the structural log consequence of each declared size
+          # must hold. Direct cards must have no BA/SQA entries; full cards must
+          # have CARD_CREATED and VERIFICATION_PASSED.
+          bash scripts/check-sizing-gate.sh fixtures/sizing-gate
+
+          # Bad-fixture sweep: fixtures/sizing-gate/bad must exit non-zero.
+          # The inversion below turns a non-zero exit into zero and vice versa, so
+          # the step fails if the bad fixtures unexpectedly pass the check.
+          if bash scripts/check-sizing-gate.sh fixtures/sizing-gate/bad 2>/dev/null; then
+            echo "Bad fixtures passed check-sizing-gate.sh — sizing violations are not being detected." >&2
+            exit 1
+          fi
+
+      - name: Verify BA card fixture has required frontmatter fields
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The BA-produced card must carry all seven required frontmatter fields.
+          card=fixtures/ba-card/TASK-BA-001.md
+          for field in 'id:' 'title:' 'size:' 'status:' 'assigned_role:' 'created_at:' 'updated_at:'; do
+            grep -q "$field" "$card" || {
+              echo "BA card fixture is missing frontmatter field: $field" >&2
+              exit 1
+            }
+          done
+          echo "PASS: BA card fixture carries all required frontmatter fields."
+
+      - name: Verify relay-trace fixture passes the evidence check
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The end-to-end relay trace card must pass per-criterion evidence check,
+          # proving the composed relay (PM -> BA -> Employee -> SQA -> PM) is complete.
+          bash scripts/check-evidence.sh fixtures/relay-trace
+
+      - name: Verify relay-trace log sequence on good and bad fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Normal sweep: the relay trace card's log trail must be complete,
+          # in order, and owned by the right role.
+          bash scripts/check-log-sequence.sh fixtures/relay-trace
+
+          # Bad-fixture sweep: fixtures/relay-trace/bad (WORK_STARTED deleted)
+          # must exit non-zero. The inversion below turns a non-zero exit into
+          # zero and vice versa, so the step fails if the broken trail passes.
+          if bash scripts/check-log-sequence.sh fixtures/relay-trace/bad 2>/dev/null; then
+            echo "Bad fixture passed check-log-sequence.sh — broken log trails are not being detected." >&2
+            exit 1
+          fi

@@ -239,9 +239,11 @@ if [ -n "$TARGET_DIR" ]; then
   # Explicit target — scan every .md file in that directory tree
   FILES=$(find "$TARGET_DIR" -name "*.md" | sort)
 else
-  # Default sweep: board/ and fixtures/ excluding the bad-fixture directory
+  # Default sweep: board/ and fixtures/ excluding bad-fixture directories.
+  # Bad-fixture directories are swept only when called with an explicit path.
   FILES=$(find board fixtures -name "*.md" \
     ! -path "fixtures/sabotage-evidence/bad/*" \
+    ! -path "fixtures/sqa-role/bad/*" \
     ! -path "./.git/*" 2>/dev/null | sort || true)
 fi
 
