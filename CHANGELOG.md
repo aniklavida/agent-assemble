@@ -17,8 +17,16 @@ published as a release, so it is listed here rather than under a version.
   selection.
 - **Roadmap** — skeleton before content.
 - **Release checklist** for v1.0.
+- **Board adapters** behind one thin contract — create a card, move a card, read
+  a card, append to the log — with a page of instructions per backend: Markdown,
+  Obsidian and Linear. Setup connects to an existing board rather than creating a
+  second, and refuses a backend the host cannot reach, naming what is missing.
+- **Verification scripts** proving the three backends produce equivalent state,
+  that an existing board is connected to and not duplicated, and that an
+  unreachable backend is refused at setup.
 
-**No skill content exists yet.** No employee, principle, board adapter or
-workflow instruction has been written. The repository is a specification.
+The repository is no longer specification-only: role, board, log, workflow and
+setup instructions exist. None of it has been released, and no live external
+board connection has been verified.
 
 [Unreleased]: https://github.com/aniklavida/agent-assemble/commits/main

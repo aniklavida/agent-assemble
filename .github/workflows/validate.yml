@@ -314,3 +314,54 @@ jobs:
             echo "Bad fixture passed check-log-sequence.sh — broken log trails are not being detected." >&2
             exit 1
           fi
+
+      - name: Verify board backend equivalence (Done-when #1)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The same operation sequence — create, move, read, append-log — must
+          # produce equivalent contract state against Markdown, Obsidian and
+          # Linear. Markdown/Obsidian run on real files; Linear runs against a
+          # local stand-in because CI has no network or API key.
+          bash scripts/check-board-adapters.sh
+
+          # Self-test: a backend that leaves frontmatter stale on move must be
+          # caught. If this unexpectedly passes, the equivalence check is not
+          # load-bearing.
+          bash scripts/check-board-adapters.sh --self-test
+
+      - name: Verify setup connects to an existing board (Done-when #2)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # A pre-seeded Markdown tree and Obsidian vault must be connected to,
+          # not duplicated.
+          bash scripts/check-board-connect-existing.sh
+
+          # Self-test: two board roots must be detected and refused.
+          bash scripts/check-board-connect-existing.sh --self-test
+
+      - name: Verify unreachable board backend is refused at setup (Done-when #3)
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Shipped instructions must state the external-backend limit where the
+          # backend is chosen.
+          bash scripts/check-board-reachability.sh --docs
+
+          # Reachable configs pass.
+          bash scripts/check-board-reachability.sh fixtures/board-adapters/reachability
+
+          # An unreachable Linear choice must be refused with a reason naming the
+          # missing capability. The inversion turns a non-zero exit from the
+          # check into a failure of the step only if the reason is absent.
+          out="$(bash scripts/check-board-reachability.sh \
+                   fixtures/board-adapters/reachability/bad 2>&1)" && {
+            echo "Unreachable Linear config passed — reachability is not enforced." >&2
+            exit 1
+          }
+          echo "$out" | grep -q "requires an MCP server or API key" || {
+            echo "Refusal did not name the missing capability. Output was:" >&2
+            echo "$out" >&2
+            exit 1
+          }

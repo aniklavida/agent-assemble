@@ -23,7 +23,9 @@ Ask these groups in order. Collect all answers before writing anything.
 
 ### Group C — The plumbing
 
-10. Where do cards live? (Markdown files in this repository · Obsidian vault · SQLite · External tracker — name it). If something already exists, connect to it rather than starting fresh.
+10. Where do cards live? (Markdown files in this repository · Obsidian vault · Linear). If something already exists, connect to it rather than starting fresh.
+
+    **State reachability at the point of choosing.** Markdown and Obsidian need only file tools and work in every host. Linear needs a Linear MCP server, or a `LINEAR_API_KEY` in the environment, and is not available in every host. If the user chooses Linear and neither capability is present, refuse the choice, name the missing capability, and offer Markdown or Obsidian — do not write a config that will fail later. The agent never reads, prints or stores the key; it checks only that the capability exists.
 11. What is the board called? (default: the repository name)
 12. Branch convention: feature branches from which base? What prefix, if any?
 13. Pull request target: which branch receives PRs?
@@ -44,9 +46,18 @@ After collecting answers, write these files without asking for additional confir
 
 ### If board config does not already exist
 
-- `.agent-assemble/board-config.md` — backend and location. See `board/references/board-adapters.md`.
+- `.agent-assemble/board-config.md` — backend and location, with
+  `existing: true` when a board was found and connected to. See
+  `board/references/board-adapters.md`.
+
+**Connect before creating.** Check for a card tree, an Obsidian vault
+(`.obsidian/`), or an existing Linear team/project before writing anything. If
+one exists, connect to it and record `existing: true`. Never scaffold a second
+board beside one that already exists.
 
 ### If board directories do not already exist (Markdown backend)
+
+Only when no existing board was found:
 
 - `board/todo/`, `board/in-progress/`, `board/testing/`, `board/done/` — empty directories with a `.keep` file in each.
 

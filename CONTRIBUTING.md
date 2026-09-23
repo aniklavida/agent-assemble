@@ -44,7 +44,7 @@ Current always-loaded cores, measured with `wc -w`:
 | Node | Words |
 | --- | --- |
 | `setup/SKILL.md` | 178 |
-| `board/SKILL.md` | 166 |
+| `board/SKILL.md` | 197 |
 | `workflow/SKILL.md` | 187 |
 | `log/SKILL.md` | 187 |
 | `documentation/SKILL.md` | 191 |
