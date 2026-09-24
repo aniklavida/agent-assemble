@@ -31,7 +31,7 @@ been run.
 - [ ] The same task completes against every supported board backend.
 - [ ] An existing board is connected to, not duplicated.
 - [ ] Choosing a backend the host cannot reach is refused at setup, with the reason.
-- [ ] A documentation change surfaces the cards it invalidates, and leaves unaffected cards alone.
+- [ ] A documentation change surfaces any cards it invalidates, and leaves unaffected cards alone.
 
 ## Tools
 
@@ -41,13 +41,13 @@ been run.
 ## Honesty
 
 - [x] Every host matrix cell is backed by what it claims; no cell reads "observed working" without a dated record of who ran it, on what.
-- [ ] The README carries the claim and its limit in the same paragraph.
+- [x] The README carries the claim and its limit in the same paragraph.
 - [ ] Release notes state plainly what is unverified.
-- [ ] No public document names a reference project except where attribution is legally required.
+- [x] No public document names a reference project except where attribution is legally required.
 
 ## Dogfood
 
-- [ ] At least one card in this project was carried end to end by the tool itself, and what went wrong is published.
+- [x] At least one card in this project was carried end to end by the tool itself, and what went wrong is published.
 
 A tool for organising agent work that was not used to organise its own is making
 a claim it has not tested.

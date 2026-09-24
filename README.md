@@ -2,99 +2,175 @@
 
 **A company your agent can work inside.**
 
-Agent Assemble is a skill — plain Markdown, no server and no runtime — that gives a coding agent the three things it does not have: **a role, a place in a process, and a memory.**
+Agent Assemble is a skill — plain Markdown, no server and no runtime. **What it provides:** a role, a place in a process, and a memory that survives the session. **What it cannot provide:** any guarantee the agent actually read the skill, followed it, or did what it said — no host application reports this. Both statements belong together; neither is published without the other.
 
-> **Status: planned.** Nothing here is implemented yet. This repository currently contains the specification, architecture and roadmap only. Every claim below describes the intended product, not working software.
+> **Status: experimental.** Core skills, role inheritance, board adapters, workflow relay, and verification harness are implemented and tested; v1.0 release packaging and cloud services are **Status: planned**.
 
-## The problem
+---
 
-An agent given a task today behaves like a capable generalist with no colleagues and no memory.
+## The Problem
 
-- **No role.** The same agent writes the API, the tests and the UI, applying the same general knowledge to each.
-- **No handoff.** It writes the code and reviews its own code. A second pair of eyes with a different brief is the highest-yield practice in software, and there is nobody to provide it.
-- **No memory.** The session ends and everything goes — what was decided, what was tried, what was rejected and why.
-- **No organisational knowledge.** A model knows what .NET is. It does not know what "done" means in your team.
+An agent given a task today behaves like a capable generalist with no colleagues and no memory:
 
-That last point is the sharpest. **The model's general knowledge is excellent and freely available. The knowledge that is missing is always local.**
+- **No role:** The same agent writes the API, the tests, and the UI, applying general knowledge to each.
+- **No handoff:** It writes code and reviews its own code without an independent gate.
+- **No memory:** The session ends and everything is lost — decisions, rejected options, and defect trails.
+- **No organizational knowledge:** A model knows standard language syntax; it does not know what "done" means in your repository.
 
-## What it is not
+The model's general knowledge is already comprehensive. The knowledge that is missing is local: your team's conventions, your project's decisions, and your definition of done.
 
-There are good projects that teach an agent *how* to work — test-driven development, systematic debugging, writing a plan. Agent Assemble does not compete with them and does not restate them. Where such a skill already teaches a practice well, this one points at it.
+---
 
-Other projects in this space ship skills that teach an agent how to work inside one specific product. This one teaches how a company works, independent of any single product.
+## What It Is Not
 
-Agent Assemble answers the questions those cannot: **who is doing this, where does the work stand, and what has already happened.**
+- **Not a methodology textbook:** Agent Assemble does not teach an agent basic engineering practices like TDD, SOLID, or debugging. Where established guides exist, it points to them.
+- **Not a server or runtime:** It requires no daemon, database process, or background service. Any agent capable of reading files and executing shell commands can use it.
+- **Not host-locked:** It uses canonical instructions in `AGENTS.md` and thin host pointers (`CLAUDE.md`, `GEMINI.md`) rather than vendor-specific walled gardens.
 
-## The shape
+Agent Assemble answers what general prompts cannot: **who is doing this, where does the work stand, and what has already happened.**
 
-A company.
+---
 
-| Part | What it holds |
-|---|---|
-| **Employees** | Role knowledge, with inheritance |
-| **Principles** | The craft — chosen per project, never imposed |
-| **Tools** | What this project uses, what it rejected, and the constraints |
-| **Documentation** | Plans and decisions — durable, edited |
-| **Workflow** | How work changes hands |
-| **Board** | Cards — the handoff vehicle |
-| **Log** | What happened — append-only |
+## The Claim, and Its Limit
 
-## How work moves
+**What it provides:** a role, a place in a process, and a memory that survives the session. **What it cannot provide:** any guarantee the agent actually read the skill, followed it, or did what it said — no host application reports this. A skill that fires and is ignored is indistinguishable from one that never fired.
 
-```
-a request arrives
-      ↓
-BA + PM          ask what is actually wanted
-      ↓
-BA               writes the plan into documentation
-      ↓
-BA               creates cards on the board
-      ↓
-the employee     the card names the role; that role's knowledge loads
-      ↓
-SQA              tests
-      ↓
-Security         tests
-      ↓
-PM               closes it
-      ↓
-LOG              records what happened
+---
+
+## Five-Minute Start
+
+Follow these steps to set up and complete one task item in under five minutes.
+
+### 1. Connect Host Pointers
+
+Ensure your host agent reads the canonical instructions in `AGENTS.md`. If using Claude Code or Gemini CLI, generate thin host pointers:
+
+```bash
+bash scripts/generate-host-pointers.sh .
 ```
 
-**The chain scales to the request.** A typo does not pass through six roles.
+This creates or updates `CLAUDE.md` and `GEMINI.md` pointing to `AGENTS.md`.
 
-## Principles, three ways
+### 2. Run Setup
 
-| Mode | Where | Behaviour |
-|---|---|---|
-| **Advisory** | while the employee works | reminds; never blocks |
-| **Prescriptive** | at a handoff gate | blocks; the card goes back |
-| **Perspective** | at review | asks a different question |
+Run the setup interview described in `setup/SKILL.md`:
 
-A developer may experiment freely. The gate is where the chosen principles bite. Perspectives — Security, Performance, Accessibility, Researcher — only ever ask.
+```bash
+# In an existing repository, detection inspects manifests and structure:
+mkdir -p .agent-assemble board/todo board/in-progress board/testing board/done log documentation/decisions
+```
 
-## Design commitments
+Write your initial configuration files:
+- `.agent-assemble/project.md` (see `setup/references/project-config-template.md`)
+- `.agent-assemble/board-config.md` (see `board/references/board-adapters.md`)
+- `documentation/decisions/decided-deferred.md` (see `documentation/references/decided-deferred-template.md`)
 
-- **A skill, not a server.** Markdown only. Any agent that can read files and run commands can use it.
-- **Never restate what the model already knows.** A node summarising framework documentation is wasted context.
-- **The log is a by-product, never a step.** If writing it can be skipped when the agent is in a hurry, it will be.
-- **Ask once, remember forever.** Setup is an interview. Daily work is not.
-- **Detect before asking.** A `.csproj` means .NET. Do not ask what can be read.
+### 3. Create a Task Item
 
-## The claim, and its limit
+Add a new task item into `board/todo/TASK-001.md` using the schema in `board/references/card-template.md`:
 
-**What it will provide:** a role, a place in a process, and a memory that survives the session.
+```markdown
+---
+id: "TASK-001"
+title: "Add healthcheck endpoint"
+size: "direct"
+status: "todo"
+assigned_role: "Employee"
+created_at: "2026-09-25T00:00:00Z"
+updated_at: "2026-09-25T00:00:00Z"
+---
 
-**What it cannot provide:** any guarantee that the agent read the skill, followed it, or did what it said. No agent host reports this. A skill that fires and is ignored is indistinguishable from one that never fired.
+## Context & Request
+Expose /health returning HTTP 200 JSON status.
 
-Both sentences belong together. Neither will be published without the other.
+## Acceptance Criteria
+- [x] GET /health returns status ok
+```
+
+Log task creation in `log/LOG.md`:
+
+```markdown
+| Timestamp | Card ID | Event | Role | Summary / Evidence | Result / Next State |
+|---|---|---|---|---|---|
+| 2026-09-25T00:00:00Z | TASK-001 | REQUEST_SIZED | PM | Evaluated as direct path | backlog (Employee) |
+| 2026-09-25T00:01:00Z | TASK-001 | CARD_CREATED | BA | Created initial task item | todo (Employee) |
+```
+
+### 4. Move and Complete Work
+
+Move the task item to `board/in-progress/TASK-001.md`, update `status: "in-progress"`, and log `WORK_STARTED`:
+
+```markdown
+| 2026-09-25T00:02:00Z | TASK-001 | WORK_STARTED | Employee | Began implementation | in-progress (Employee) |
+```
+
+Implement your change, verify it, update the task item to `status: "done"`, move it to `board/done/TASK-001.md`, and log completion:
+
+```markdown
+| 2026-09-25T00:05:00Z | TASK-001 | DIRECT_CLOSED | PM | Verified endpoint returns 200 OK | done |
+```
+
+### 5. Verify Invariants
+
+Run verification scripts to ensure log and board consistency:
+
+```bash
+bash scripts/check-log-sequence.sh board
+bash scripts/check-evidence.sh
+```
+
+---
+
+## Host Support Matrix
+
+Agent Assemble maintains a strict four-state matrix. No cell claims more than what was verified:
+
+| Host | Pointer file | Status | Substantiation |
+|---|---|---|---|
+| **Claude Code** | `CLAUDE.md` | Mechanically verified | Thin pointer exists, imports `@AGENTS.md`, and path resolution passes in CI. Real vendor application execution is not automated. |
+| **Codex** | `AGENTS.md` | Mechanically verified | Reads the canonical tool-neutral source `AGENTS.md` directly. Real vendor application execution is not automated. |
+| **Gemini CLI** | `GEMINI.md` | Mechanically verified | Thin pointer exists, references `AGENTS.md`, and path resolution passes in CI. Real vendor application execution is not automated. |
+| **Cursor** | `AGENTS.md` | Mechanically verified | Reads the canonical tool-neutral source `AGENTS.md` directly. Real vendor application execution is not automated. |
+| **Kimi** | None | Not verified | Host tool is not currently configured or targeted in this repository. |
+| **Windsurf** | None | Not verified | Host tool is not currently configured or targeted in this repository. |
+| **GitHub Copilot** | None | Not verified | Host tool is not currently configured or targeted in this repository. |
+
+The four permitted states:
+1. **Mechanically verified:** The pointer resolves to canonical source in CI.
+2. **Config-shape verified:** Documented vendor configuration format parsed and validated.
+3. **Observed working:** A human observed the skill firing in the live vendor app (requires dated substantiation).
+4. **Not verified:** Untested or unconfigured hosts.
+
+---
+
+## Known Limitations
+
+- **No verification of execution by host:** No host reports whether an agent loaded or followed a skill. A prompt that is ignored produces no warning.
+- **Storage concurrency:** The default Markdown and Obsidian board adapters rely on filesystem directory structure. Concurrent multi-agent access without locking can cause race conditions.
+- **External tracker availability:** Adapters like Linear require an active MCP server or API key and are not available in every host.
+- **Context ceilings:** Roles are capped at 200 words for core files to preserve context space. Extensive tutorials belong in external documentation.
+
+---
+
+## Dogfooding Agent Assemble
+
+This project uses its own skills, role structures, board adapters, and append-only log to build and maintain itself. See [docs/DOGFOOD.md](docs/DOGFOOD.md) for the full report of carrying work items through this relay, including observed friction points and failures.
+
+---
 
 ## Documentation
 
-- [Specification](docs/SPEC.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Release checklist](docs/RELEASE_CHECKLIST.md)
+- [Specification](docs/SPEC.md) — The seven parts and core invariants
+- [Architecture](docs/ARCHITECTURE.md) — Context budgets, multi-host pointers, and adapters
+- [Authoring Guide](docs/AUTHORING.md) — Authoring roles, principles, and board adapters
+- [Dogfood Report](docs/DOGFOOD.md) — Honest records of running the tool on itself
+- [Roadmap](docs/ROADMAP.md) — Milestones from skeleton to v1.0
+- [Release Checklist](docs/RELEASE_CHECKLIST.md) — Verifiable criteria gating v1.0
+- [Contributing](CONTRIBUTING.md) — Contribution process and word budgets
+- [Security Policy](SECURITY.md) — Threat model and vulnerability reporting
+- [Code of Conduct](CODE_OF_CONDUCT.md) — Standards and enforcement
+
+---
 
 ## Licence
 
