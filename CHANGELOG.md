@@ -24,6 +24,13 @@ published as a release, so it is listed here rather than under a version.
 - **Verification scripts** proving the three backends produce equivalent state,
   that an existing board is connected to and not duplicated, and that an
   unreachable backend is refused at setup.
+- **Tools registry** — detection of a repository's declared dependencies from its
+  manifests, decision records for chosen and rejected tools, a fixed licence
+  policy (compiled → permissive; separate process → copyleft allowed; never
+  SSPL, BSL, RSAL, Elastic, RPL or gated licences), and suggestions filtered
+  through the project's own constraints. Enforced by
+  `scripts/check-tools-registry.sh`, which proves detection, filtering, refusal
+  and the `redis:7-alpine` → RSALv2 container-tag case.
 
 The repository is no longer specification-only: role, board, log, workflow and
 setup instructions exist. None of it has been released, and no live external

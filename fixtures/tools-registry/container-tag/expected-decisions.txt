@@ -1,0 +1,2 @@
+REFUSE redis:7-alpine (container image; RSALv2) — tag resolves to Redis 7.4.0; licence RSALv2 is on the never-adopt list (rule: never-adopt-gated-licences).
+ALLOW postgres:16-alpine (container image; PostgreSQL)

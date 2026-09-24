@@ -1,0 +1,7 @@
+Tool inventory:
+Manifests detected: 0
+Declared dependencies: 0
+Container images: 0
+
+No manifests found (package.json, go.mod, requirements.txt, Cargo.toml).
+Detection is a candidate list, not an adoption. Confirm each before use.

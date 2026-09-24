@@ -1,0 +1,10 @@
+[package]
+name = "detect-fixture"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+serde = "1.0.204"
+
+[dev-dependencies]
+tokio = "1.39.2"

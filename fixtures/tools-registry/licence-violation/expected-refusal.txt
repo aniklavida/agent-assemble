@@ -1,0 +1,1 @@
+REFUSE left-pad-plus (compiled; GPL-3.0) — GPL-3.0 is not permissive and the component is compiled into user code (rule: compiled-requires-permissive).
