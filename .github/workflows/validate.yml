@@ -26,6 +26,8 @@ jobs:
             SECURITY.md
             CODE_OF_CONDUCT.md
             AGENTS.md
+            CLAUDE.md
+            GEMINI.md
             docs/SPEC.md
             docs/ARCHITECTURE.md
             docs/ROADMAP.md
@@ -379,4 +381,46 @@ jobs:
 
           # Detect mode against this repository must still exit 0.
           bash scripts/check-tools-registry.sh --detect . > /dev/null
+
+      - name: Verify multi-host pointers, duplicate guard and matrix honesty
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Check root repository pointers and host matrix
+          bash scripts/check-host-pointers.sh
+
+          # Automated self-tests covering:
+          # 1. One source produces correct pointers for every supported host
+          # 2. Duplicate instruction into a host file fails and names both files
+          # 3. Broken pointer fails and names the host
+          # 4. Host matrix honesty: unrecorded "observed working" is refused
+          bash scripts/check-host-pointers.sh --self-test
+
+          # Fixture sweep: good fixture must pass
+          bash scripts/check-host-pointers.sh fixtures/host-pointers/good
+
+          # Bad duplicate sweep: must exit non-zero, naming both files
+          dup_out="$(bash scripts/check-host-pointers.sh fixtures/host-pointers/bad-duplicate 2>&1 || true)"
+          if bash scripts/check-host-pointers.sh fixtures/host-pointers/bad-duplicate 2>/dev/null; then
+            echo "Bad duplicate fixture unexpectedly passed check-host-pointers.sh" >&2
+            exit 1
+          fi
+          echo "$dup_out" | grep -q "AGENTS.md" && echo "$dup_out" | grep -q "CLAUDE.md" || {
+            echo "Duplicate check did not name both files. Output was:" >&2
+            echo "$dup_out" >&2
+            exit 1
+          }
+
+          # Bad broken sweep: must exit non-zero, naming the host
+          broken_out="$(bash scripts/check-host-pointers.sh fixtures/host-pointers/bad-broken 2>&1 || true)"
+          if bash scripts/check-host-pointers.sh fixtures/host-pointers/bad-broken 2>/dev/null; then
+            echo "Bad broken fixture unexpectedly passed check-host-pointers.sh" >&2
+            exit 1
+          fi
+          echo "$broken_out" | grep -qi "Claude" || {
+            echo "Broken pointer check did not name the host. Output was:" >&2
+            echo "$broken_out" >&2
+            exit 1
+          }
+
 
