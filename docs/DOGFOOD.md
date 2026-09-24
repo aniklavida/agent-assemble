@@ -115,6 +115,16 @@ These are the findings, not the sales pitch.
    README publishes is not a hedge; it was the observed condition. Nothing here
    can claim otherwise.
 
+9. **A clean checkout had one board column and not the other three.** Git does
+   not track empty directories, so the columns not needed for the committed card
+   — `todo/`, `in-progress/` and `testing/` — did not exist on a fresh clone,
+   even though the adapter page and the workflow describe a four-column tree. The
+   next session to pick up a card would have had to recreate directories the
+   project said already existed. It was fixed by committing the column skeleton
+   (`.gitkeep` in each). This was found only because the five-minute start was run
+   on a real clone instead of being assumed, which is the clearest argument in
+   this run for doing that.
+
 ## What the run used, precisely
 
 - Board: `board/done/TASK-013.md`, moved through
