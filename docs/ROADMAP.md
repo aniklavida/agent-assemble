@@ -3,7 +3,12 @@
 **Skeleton before content.** A tree of empty nodes that hands off correctly is
 worth more than fifty well-written role files that never reach each other.
 
-Nothing below is implemented.
+The repository is no longer empty. The skeleton, setup interview, board
+adapters, the first employee slice, the principles, the relay roles, the
+perspectives, the tools registry and drift reconciliation all exist and are
+exercised by the checks in `scripts/`. None of it has been released. The *done
+when* line under each milestone records what that milestone still requires
+beyond what is present.
 
 ## 1 · Skeleton
 
