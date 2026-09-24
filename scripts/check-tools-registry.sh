@@ -305,13 +305,17 @@ else
   fi
 
   # A refused candidate is absent entirely — no warning, no caveat.
+  _offered=0
   for _rejected in redis-server elasticsearch datadog-agent sentry-hosted; do
     if grep -q "$_rejected" "$TMP/suggest.out"; then
       echo "FAIL (suggest): refused candidate '$_rejected' was offered — a violation must not be offered at all." >&2
       FAILED=1
+      _offered=1
     fi
   done
-  echo "PASS (suggest): refused candidates are absent from the returned list."
+  if [ "$_offered" -eq 0 ]; then
+    echo "PASS (suggest): refused candidates are absent from the returned list."
+  fi
 fi
 
 # ── Check 3: a non-permissive compiled dependency is refused ──────────────────
