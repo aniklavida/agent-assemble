@@ -1,0 +1,28 @@
+Tool inventory:
+Manifests detected: 4
+Declared dependencies: 10
+Container images: 2
+
+package.json:
+  express 4.19.2
+  undici 6.19.2
+  vitest 2.0.5
+
+go.mod:
+  github.com/google/uuid v1.6.0
+  github.com/spf13/cobra v1.8.1
+  golang.org/x/text v0.17.0
+
+requirements.txt:
+  flask >=3.0
+  requests 2.32.3
+
+Cargo.toml:
+  serde 1.0.204
+  tokio 1.39.2
+
+container images:
+  postgres:16-alpine
+  redis:7-alpine
+
+Detection is a candidate list, not an adoption. Confirm each before use.

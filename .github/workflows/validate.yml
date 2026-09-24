@@ -365,3 +365,18 @@ jobs:
             echo "$out" >&2
             exit 1
           }
+
+      - name: Verify tools registry, licence policy and constraint filtering
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Detection inventories a manifest-bearing fixture exactly, reports
+          # this repository truthfully (no manifests, no dependencies), and
+          # never blocks. Suggestions return only constraint-passing options;
+          # a non-permissive compiled dependency and a tag masking a licence
+          # change are both refused. The script runs its own fixture checks.
+          bash scripts/check-tools-registry.sh
+
+          # Detect mode against this repository must still exit 0.
+          bash scripts/check-tools-registry.sh --detect . > /dev/null
+
