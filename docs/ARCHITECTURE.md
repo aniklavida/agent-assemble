@@ -93,6 +93,19 @@ The host matrix therefore distinguishes four states:
 
 No cell claims more than was done.
 
+### Host support matrix
+
+| Host | Pointer file | Status | Substantiation |
+|---|---|---|---|
+| **Claude Code** | `CLAUDE.md` | Mechanically verified | Thin pointer exists, imports `@AGENTS.md`, and path resolution passes in CI. Real vendor application execution is not automated. |
+| **Codex** | `AGENTS.md` | Mechanically verified | Reads the canonical tool-neutral source `AGENTS.md` directly. Real vendor application execution is not automated. |
+| **Gemini CLI** | `GEMINI.md` | Mechanically verified | Thin pointer exists, references `AGENTS.md`, and path resolution passes in CI. Real vendor application execution is not automated. |
+| **Cursor** | `AGENTS.md` | Mechanically verified | Reads the canonical tool-neutral source `AGENTS.md` directly. Real vendor application execution is not automated. |
+| **Kimi** | None | Not verified | Host tool is not currently configured or targeted in this repository. |
+| **Windsurf** | None | Not verified | Host tool is not currently configured or targeted in this repository. |
+| **GitHub Copilot** | None | Not verified | Host tool is not currently configured or targeted in this repository. |
+
+
 ## Board adapters
 
 One thin contract — create a card, move a card, read a card, append to the log —

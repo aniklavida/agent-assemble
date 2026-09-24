@@ -40,7 +40,7 @@ been run.
 
 ## Honesty
 
-- [ ] Every host matrix cell is backed by what it claims; no cell reads "observed working" without a dated record of who ran it, on what.
+- [x] Every host matrix cell is backed by what it claims; no cell reads "observed working" without a dated record of who ran it, on what.
 - [ ] The README carries the claim and its limit in the same paragraph.
 - [ ] Release notes state plainly what is unverified.
 - [ ] No public document names a reference project except where attribution is legally required.
