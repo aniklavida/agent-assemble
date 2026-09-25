@@ -1,6 +1,7 @@
 # Architecture
 
-**Status:** planned. Nothing here is implemented.
+**Status:** experimental. The structure described here exists in the repository
+and is exercised by the checks in `scripts/`; nothing has been released.
 
 ## Form
 

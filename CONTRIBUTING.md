@@ -2,9 +2,12 @@
 
 Thank you for considering a contribution.
 
-**Current state:** this repository is a specification. There is no skill content
-to extend yet. The most useful contribution today is telling us where the design
-is wrong.
+**Current state:** the skill content exists and is **experimental** — role,
+principle, board, log, workflow and setup instructions are in the repository,
+and the scripts in `scripts/` exercise them on every change. Nothing has been
+released. The most useful contribution is still telling us where the design is
+wrong, and second to that, extending a node with knowledge a model would not
+already have.
 
 ## The rule that governs everything here
 
@@ -28,16 +31,17 @@ well written.
 Every node has a small always-loaded core and unlimited references loaded on
 demand.
 
-**The ceiling is 200 words** for the always-loaded core of a node — its `SKILL.md`
-file only, not its `references/` files, which remain unlimited.
+**The ceiling is 200 words** for the always-loaded core of a node — its
+`SKILL.md` file only, not its `references/` files, which remain unlimited.
 
 This is enforced rather than encouraged, for a reason: without enforcement every
 contributor adds a little more, and within a year the composed context exceeds
 what any agent can hold. If your addition does not fit the core, it is a
 reference.
 
-The limit is enforced by `scripts/check-word-budget.sh`, which runs in CI on every
-push and pull request.
+The limit is enforced by `scripts/check-word-budget.sh`, which runs in CI on
+every push and pull request. A composed multi-level role is measured separately
+by `scripts/check-composed-budget.sh`.
 
 Current always-loaded cores, measured with `wc -w`:
 
@@ -52,6 +56,11 @@ Current always-loaded cores, measured with `wc -w`:
 A reference file has no ceiling and is not counted here, because it is loaded
 only when the node needs it.
 
+## Authoring a role, a principle or a board adapter
+
+Start with [docs/AUTHORING.md](docs/AUTHORING.md). It gives the required shape
+of each, the real file paths, and the check that fails if the shape is wrong.
+
 ## Instructions are reviewed as code
 
 An agent reads these files and acts on them with a filesystem and a shell. A
@@ -64,6 +73,34 @@ Specifically, an instruction must never:
 - ask an agent to handle a credential, token or password;
 - assume a capability the agent may not have, without saying so.
 
+## Run the checks before you push
+
+The same scripts CI runs can be run locally. At minimum, run the check for the
+thing you touched:
+
+```bash
+bash scripts/check-word-budget.sh                  # 200-word cores
+bash scripts/check-duplicate-sentences.sh employees
+bash scripts/check-role-skeleton.sh fixtures/role-skeleton/good
+bash scripts/check-principles.sh fixtures/principles
+bash scripts/check-board-adapters.sh
+bash scripts/check-host-pointers.sh
+bash scripts/check-public-docs.sh
+```
+
+A check that only passes is not evidence. Break the thing it protects and
+confirm the named check fails; if it still passes, that is a finding — see
+[docs/AUTHORING.md](docs/AUTHORING.md) and the three permitted causes in
+[board/references/sabotage-evidence-guide.md](board/references/sabotage-evidence-guide.md).
+
+## Branches and pull requests
+
+- Branch from `develop`; pull requests target `develop`.
+- One card or one concern per pull request. If the board carries the work, put
+  the card id in the description.
+- A new host is described by a thin pointer, never by copied instructions. See
+  the multi-host section of [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 ## Before you open a pull request
 
 - Say which of the seven parts your change belongs to, and why it belongs there
@@ -71,6 +108,8 @@ Specifically, an instruction must never:
 - If it adds a node, state what a model would not already know.
 - If it adds a host, say which of the four verification states it is in and what
   you actually ran.
+- If it reuses code under a licence, state the licence and the required
+  attribution. Otherwise, do not name another project.
 
 ## Claims
 
@@ -78,3 +117,8 @@ Every statement about what this project does is one of: **implemented and
 tested**, **experimental**, **planned**, or **unsupported**. Nothing is
 described as working until it has been run. A green test that proves nothing is
 worse than no test, because it invites trust.
+
+The value proposition — a role, a place in a process, and a memory that
+survives the session — is always published with its limit: no host reports
+whether the agent read the skill, followed it, or did what it said. The pairing
+is enforced by `scripts/check-public-docs.sh`.

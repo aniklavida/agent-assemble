@@ -13,8 +13,8 @@ been run.
 
 ## Structure
 
-- [ ] A word ceiling has been chosen and a command enforces it. Until then this
-      item cannot be met, and the release it gates cannot be made.
+- [x] A word ceiling has been chosen and a command enforces it —
+      `scripts/check-word-budget.sh` fails a core above 200 words on every push.
 - [ ] A composed multi-level role is measured against that ceiling rather than estimated.
 - [ ] No sentence appears at two levels — checked mechanically, not by reading.
 - [ ] **Removing a parent level provably changes the child's behaviour.** If it does not, the inheritance is decorative and this line fails.
@@ -41,13 +41,18 @@ been run.
 ## Honesty
 
 - [x] Every host matrix cell is backed by what it claims; no cell reads "observed working" without a dated record of who ran it, on what.
-- [ ] The README carries the claim and its limit in the same paragraph.
+- [x] The README carries the claim and its limit in the same paragraph, and
+      `scripts/check-public-docs.sh` fails a public document that splits them.
 - [ ] Release notes state plainly what is unverified.
-- [ ] No public document names a reference project except where attribution is legally required.
+- [x] No public document names a reference project except where attribution is
+      legally required; an external repository URL is refused by
+      `scripts/check-public-docs.sh`.
 
 ## Dogfood
 
-- [ ] At least one card in this project was carried end to end by the tool itself, and what went wrong is published.
+- [x] At least one card in this project was carried end to end by the tool
+      itself, and what went wrong is published in
+      [DOGFOOD.md](DOGFOOD.md).
 
 A tool for organising agent work that was not used to organise its own is making
 a claim it has not tested.

@@ -1,7 +1,8 @@
 # Agent Assemble — specification
 
-**Status:** planned. Nothing in this document is implemented.
-**Updated:** 2026-09-18
+**Status:** experimental. The mechanisms described here exist in the repository
+and are exercised by the scripts in `scripts/`; nothing has been released.
+**Updated:** 2026-09-24
 
 ## What it is
 
@@ -235,13 +236,11 @@ the perspective roles built for that question; each asks and never blocks.
 ## The claim, and its limit
 
 **What it provides:** a role, a place in a process, and a memory that survives
-the session.
+the session. **What it cannot provide:** any guarantee the agent read the skill,
+followed it, or did what it said. No host reports this. A skill that fires and is
+ignored is indistinguishable from one that never fired.
 
-**What it cannot provide:** any guarantee the agent read the skill, followed it,
-or did what it said. No host reports this. A skill that fires and is ignored is
-indistinguishable from one that never fired.
-
-Both sentences ship together.
+Both sentences ship together. Neither is published without the other.
 
 ## Version 1.0 scope
 

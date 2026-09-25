@@ -75,12 +75,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          # The README describes a product that does not exist yet. Until it
-          # does, it must say so. This fails if the status line is removed or
-          # weakened before there is something to describe.
-          grep -q 'Status: planned' README.md || {
-            echo "README no longer states that the product is planned."
-            echo "Remove this check only when something is genuinely implemented."
+          # The README must state its status with one of the four permitted
+          # claim states. It no longer has to say "planned" now that the skill
+          # and its verification harness exist, but it must not describe
+          # anything as working that has not been run.
+          grep -qiE 'Status: (implemented and tested|experimental|planned|unsupported)' README.md || {
+            echo "README does not state a status using the four permitted claim states."
             exit 1
           }
 
@@ -422,5 +422,26 @@ jobs:
             echo "$broken_out" >&2
             exit 1
           }
+
+      - name: Verify public documentation invariants
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The value proposition and its limit travel in the same paragraph,
+          # the README carries the sections a stranger needs, the authoring
+          # guide is complete, the dogfood report names friction, and no public
+          # document names an external repository. The self-test proves each
+          # check can fail.
+          bash scripts/check-public-docs.sh
+          bash scripts/check-public-docs.sh --self-test
+
+      - name: Verify the project's own board and log trail
+        shell: bash
+        run: |
+          set -euo pipefail
+          # The card this project used on itself must have an unbroken,
+          # correctly ordered trail in log/LOG.md. A dogfood claim whose trail
+          # does not pass the shipped check is not evidence.
+          bash scripts/check-log-sequence.sh board
 
 
