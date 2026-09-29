@@ -12,3 +12,10 @@ Append-only. Never edit or reorder a past row. Schema:
 | 2026-09-25T00:14:00Z | TASK-013 | VERIFICATION_STARTED | SQA | Read the card and handoff; began independent execution of the invariant checks | testing (SQA) |
 | 2026-09-25T00:25:00Z | TASK-013 | VERIFICATION_PASSED | SQA | All eight criteria verified; each mutation made its named test fail; evidence recorded | review (PM) |
 | 2026-09-25T00:30:00Z | TASK-013 | CARD_CLOSED | PM | Log trail audited with `scripts/check-log-sequence.sh board`; card moved to `board/done/TASK-013.md` | done |
+| 2026-09-29T21:39:00Z | TASK-014 | REQUEST_SIZED | PM | v1.0 release proof; cross-cutting verification run plus release notes; scored Full | backlog (BA) |
+| 2026-09-29T21:40:00Z | TASK-014 | CARD_CREATED | BA | Twelve criteria identified; card created at `board/done/TASK-014.md` directly (inline sizing) | todo (Employee) |
+| 2026-09-29T21:41:00Z | TASK-014 | WORK_STARTED | Employee | Ran every verification script in the foreground; recorded verbatim output | in-progress (Employee) |
+| 2026-09-29T21:47:00Z | TASK-014 | WORK_COMPLETED | Employee | Wrote `docs/RELEASE_NOTES_v1.0.md`, updated `docs/RELEASE_CHECKLIST.md`, created `board/done/TASK-014.md`; all checks pass | testing (SQA) |
+| 2026-09-29T21:47:00Z | TASK-014 | VERIFICATION_PASSED | SQA | All twelve criteria verified with named tests; gaps recorded honestly; `check-public-docs.sh`, `check-word-budget.sh`, `check-log-sequence.sh`, `check-evidence.sh` all pass | review (PM) |
+| 2026-09-29T21:47:00Z | TASK-014 | CARD_CLOSED | PM | Log trail confirmed with `scripts/check-log-sequence.sh board`; card at `board/done/TASK-014.md` | done |
+

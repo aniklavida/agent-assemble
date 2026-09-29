@@ -46,6 +46,13 @@ published as a release, so it is listed here rather than under a version.
   repository's own board, log and per-criterion sabotage discipline. The report,
   including what went wrong, is in `docs/DOGFOOD.md`; the trail is checked by
   `scripts/check-log-sequence.sh board` and `scripts/check-evidence.sh`.
+- **v1.0 release proof** — every acceptance criterion from `docs/RELEASE_CHECKLIST.md`
+  was exercised in a single foreground session (`TASK-014`). Command outputs are
+  recorded verbatim. Items requiring a vendor host (second-session memory read,
+  existing-repository interview in a real agent application, end-to-end relay
+  in Obsidian or Linear) are recorded honestly as gaps rather than asserted as
+  passing. The checklist is updated with verification dates and outputs; the
+  release notes are in `docs/RELEASE_NOTES_v1.0.md`.
 
 
 The repository is no longer specification-only: role, board, log, workflow and
